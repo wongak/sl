@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/chzyer/readline"
+	"github.com/wongak/sl/sl"
 )
 
 type (
@@ -35,7 +37,17 @@ func runWithCode() int {
 			fmt.Fprintf(app.rl.Config.Stderr, "error on input: %v\n\n", err)
 			return 1
 		}
-		fmt.Fprintf(app.rl.Config.Stdout, "%s\n", line)
+		rd := strings.NewReader(line)
+		p := sl.NewParser(rd)
+		n, err := p.Parse()
+		if err != nil {
+			fmt.Fprintf(app.rl.Config.Stderr, "%v\n", err)
+			continue
+		}
+		if n != nil {
+			fmt.Fprintf(app.rl.Config.Stdout, "%s\n", n)
+			continue
+		}
 	}
 	return 0
 }
